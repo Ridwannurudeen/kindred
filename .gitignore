@@ -1,0 +1,39 @@
+# From arcium init
+.anchor
+.DS_Store
+target
+**/*.rs.bk
+node_modules
+test-ledger
+.yarn
+encrypted-ixs/arcis_temp_target
+build
+encrypted-ixs/src/main.rs
+artifacts/
+
+# Kindred-specific
+dist/
+*.so
+*.tsbuildinfo
+build.log
+*.log
+.pnpm-store/
+.idea/
+.vscode/
+*.swp
+
+# Local env (never commit secrets)
+.env
+.env.local
+.env.*.local
+
+# Solana
+solana-localnet/
+
+# Synthetic data outputs (regenerable from data/synthetic-profiles/generate.ts)
+data/synthetic-profiles/csv/
+data/synthetic-profiles/profiles.json
+app/public/synthetic-profiles/
+
+# Frontend build output
+app/dist/

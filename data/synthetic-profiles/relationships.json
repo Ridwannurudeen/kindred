@@ -1,0 +1,178 @@
+{
+  "generated": "2026-05-09T20:16:05.143Z",
+  "seed": "kindred-demo-v1",
+  "description": "Ground truth for Kindred synthetic registry. Every pair listed here is consumed by tests/kinship.test.ts and the frontend demo loader to verify MXE-computed IBS against expected ranges.",
+  "ibsRanges": {
+    "identical": {
+      "min": 40,
+      "max": 40
+    },
+    "parentChild": {
+      "min": 20,
+      "max": 26
+    },
+    "fullSibling": {
+      "min": 20,
+      "max": 32
+    },
+    "halfSibling": {
+      "min": 12,
+      "max": 20
+    },
+    "avuncular": {
+      "min": 12,
+      "max": 20
+    },
+    "firstCousin": {
+      "min": 10,
+      "max": 16
+    },
+    "unrelated": {
+      "min": 0,
+      "max": 14
+    }
+  },
+  "positiveMatches": [
+    {
+      "a": "OAR-001",
+      "b": "TAR-002",
+      "orgA": "Oregon Adoption Registry",
+      "orgB": "Texas Adoption Registry",
+      "expected": "parentChild",
+      "expectedIbsRange": {
+        "min": 20,
+        "max": 26
+      },
+      "computedIbs": 21,
+      "inExpectedRange": true,
+      "crossOrg": true,
+      "demo": "Maya cross-org centerpiece",
+      "notes": "Maya (Oregon adoptee) ↔ biological mother (Texas registry) — federation primitive demo"
+    },
+    {
+      "a": "DCN-001",
+      "b": "DCN-004",
+      "orgA": "Donor-Conceived Network",
+      "orgB": "Donor-Conceived Network",
+      "expected": "halfSibling",
+      "expectedIbsRange": {
+        "min": 12,
+        "max": 20
+      },
+      "computedIbs": 15,
+      "inExpectedRange": true,
+      "crossOrg": false,
+      "demo": "Aiden donor-conceived intra-org",
+      "notes": "Shared anonymous donor #7421 — intra-org half-sibling discovery"
+    },
+    {
+      "a": "DHF-001",
+      "b": "DHF-003",
+      "orgA": "Diaspora Heritage Foundation",
+      "orgB": "Diaspora Heritage Foundation",
+      "expected": "avuncular",
+      "expectedIbsRange": {
+        "min": 12,
+        "max": 20
+      },
+      "computedIbs": 13,
+      "inExpectedRange": true,
+      "crossOrg": false,
+      "demo": "Ren diaspora intra-org",
+      "notes": "Paternal uncle-nephew — avuncular (kinship coefficient 0.125)"
+    }
+  ],
+  "negativeControls": [
+    {
+      "a": "UNHCR-001",
+      "b": "UNHCR-002",
+      "orgA": "UNHCR Family Tracing",
+      "orgB": "UNHCR Family Tracing",
+      "expected": "unrelated",
+      "expectedIbsRange": {
+        "min": 0,
+        "max": 14
+      },
+      "computedIbs": 1,
+      "inExpectedRange": true,
+      "crossOrg": false,
+      "demo": "Noor true-negative",
+      "notes": "Noor (refugee, no kin in registry) ↔ unrelated UNHCR registrant"
+    },
+    {
+      "a": "OAR-001",
+      "b": "OAR-002",
+      "orgA": "Oregon Adoption Registry",
+      "orgB": "Oregon Adoption Registry",
+      "expected": "unrelated",
+      "expectedIbsRange": {
+        "min": 0,
+        "max": 14
+      },
+      "computedIbs": 8,
+      "inExpectedRange": true,
+      "crossOrg": false,
+      "notes": "Maya ↔ unrelated Oregon registrant — intra-org negative"
+    },
+    {
+      "a": "OAR-001",
+      "b": "TAR-001",
+      "orgA": "Oregon Adoption Registry",
+      "orgB": "Texas Adoption Registry",
+      "expected": "unrelated",
+      "expectedIbsRange": {
+        "min": 0,
+        "max": 14
+      },
+      "computedIbs": 6,
+      "inExpectedRange": true,
+      "crossOrg": true,
+      "notes": "Maya ↔ unrelated Texas registrant — cross-org negative (federation w/ no match)"
+    },
+    {
+      "a": "DCN-001",
+      "b": "DCN-002",
+      "orgA": "Donor-Conceived Network",
+      "orgB": "Donor-Conceived Network",
+      "expected": "unrelated",
+      "expectedIbsRange": {
+        "min": 0,
+        "max": 14
+      },
+      "computedIbs": 6,
+      "inExpectedRange": true,
+      "crossOrg": false,
+      "notes": "Aiden ↔ different-donor DCN registrant"
+    },
+    {
+      "a": "DHF-001",
+      "b": "DHF-002",
+      "orgA": "Diaspora Heritage Foundation",
+      "orgB": "Diaspora Heritage Foundation",
+      "expected": "unrelated",
+      "expectedIbsRange": {
+        "min": 0,
+        "max": 14
+      },
+      "computedIbs": 8,
+      "inExpectedRange": true,
+      "crossOrg": false,
+      "notes": "Ren ↔ unrelated DHF registrant"
+    },
+    {
+      "a": "OAR-003",
+      "b": "DHF-004",
+      "orgA": "Oregon Adoption Registry",
+      "orgB": "Diaspora Heritage Foundation",
+      "expected": "unrelated",
+      "expectedIbsRange": {
+        "min": 0,
+        "max": 14
+      },
+      "computedIbs": 12,
+      "inExpectedRange": true,
+      "crossOrg": true,
+      "notes": "Random unrelated cross-org pair — federation noise floor"
+    }
+  ]
+}
