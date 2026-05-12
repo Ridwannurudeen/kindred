@@ -98,6 +98,34 @@ t1      browse federated orgs       (reads on-chain orgs + agreements)
 
 The MXE never sees the buckets in plaintext. Each Arx node holds a secret share of each bucket. The IBS computation runs across the secret-shared state, and only the reconstructed final score (a single u8) becomes public after the callback.
 
+## Circuit storage (off-chain, hash-committed)
+
+Compiled Arcis circuits total 9.22 MB across the 4 circuits. Storing them in `comp_def` accounts on Solana would cost ~64 SOL in rent (≈6.96 SOL/MB). Kindred uses Arcium's documented off-chain storage path instead:
+
+```
+programs/kindred/src/lib.rs    init_<circuit>_comp_def writes
+                               CircuitSource::OffChain {
+                                 source: "https://kindred.gudman.xyz/circuits/<name>.arcis",
+                                 hash: circuit_hash!("<name>"),  // SHA-256 baked in at compile time
+                               }
+                               ─► comp_def account holds URL (~80 B) + 32-B hash
+                                  Total cost ≈ 0.02 SOL across all 4 (~3000× cheaper)
+
+VPS (nginx /circuits/ → /var/www/kindred-circuits/)
+    serves the 4 .arcis files over HTTPS, public, no auth
+
+Arx node (per computation)
+    1. reads comp_def.circuit_source.{source, hash} from chain
+    2. fetches the URL
+    3. computes SHA-256 of the fetched bytes
+    4. compares against the on-chain hash
+    5. mismatch → aborts the computation
+```
+
+Verifiability is equivalent to on-chain storage — the on-chain commitment is a canonical 32-byte hash. RTG judges can re-derive: `arcium build` from this repo, `sha256sum build/<name>.arcis`, compare against the comp_def account's `circuit_source.hash` field. The repo's `scripts/upload-circuits-to-vps.sh` prints the local SHA-256 before uploading; `scripts/init-comp-defs.ts` prints it again after init.
+
+Trust assumption: the VPS host must stay reachable. Mitigation: a hash mismatch is detected and refused, so a compromised host can only DoS (not silently substitute a malicious circuit). An IPFS mirror is a v2 nice-to-have.
+
 ## Federation agreement lifecycle
 
 ```

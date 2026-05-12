@@ -35,6 +35,10 @@ Hallucinations encountered and corrected during the build:
 - Initial install URL `arcium.com/install` was wrong — corrected to `install.arcium.com`
 - Initial Arcium.toml schema (`cluster_offset`, `recovery_set_size`) was outdated — replaced with current `[localnet]` block schema
 
+## Design pivots (recorded for honesty)
+
+- **On-chain → off-chain circuit storage.** Original plan uploaded all 4 compiled `.arcis` (9.22 MB) into Solana `comp_def` accounts: rent ≈ 64 SOL. Switched to Arcium's documented off-chain path (`CircuitSource::OffChain { source: URL, hash: SHA-256 }`) hosted on the project VPS at `https://kindred.gudman.xyz/circuits/`. Total comp_def rent drops to ~0.02 SOL across all 4. Integrity is preserved: Arx nodes hash the fetched bytes and refuse the computation on mismatch. See `docs/ARCHITECTURE.md` → "Circuit storage" for the full flow and the judge-verification recipe.
+
 ## Reproducibility
 
 Every code file in this repo was authored or co-authored with AI assistance. The full conversation history is available on request. The build pipeline is deterministic given the toolchain pins in `Cargo.toml` and `package.json`.

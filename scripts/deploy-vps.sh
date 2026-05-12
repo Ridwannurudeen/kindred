@@ -64,6 +64,17 @@ server {
     root $REMOTE_DIR;
     index index.html;
 
+    # Off-chain Arcis circuits — fetched by Arx nodes, integrity-checked
+    # against the on-chain comp_def hash. Must precede the SPA fallback so
+    # /circuits/*.arcis isn't rewritten to index.html.
+    location /circuits/ {
+        alias /var/www/kindred-circuits/;
+        default_type application/octet-stream;
+        add_header Access-Control-Allow-Origin "*";
+        add_header Cache-Control "public, max-age=3600";
+        autoindex off;
+    }
+
     # SPA fallback (React Router client-side routing)
     location / {
         try_files \$uri \$uri/ /index.html;
