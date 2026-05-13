@@ -21,8 +21,8 @@ set -euo pipefail
 
 VPS_HOST="${VPS_HOST:-root@gudman.xyz}"
 DOMAIN="${DOMAIN:-kindred.gudman.xyz}"
-REMOTE_DIR="${REMOTE_DIR:-/opt/kindred}"
-WEBROOT="${WEBROOT:-/var/www/letsencrypt}"
+REMOTE_DIR="${REMOTE_DIR:-/opt/kindred/web}"
+WEBROOT="${WEBROOT:-/var/www/html}"
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 APP_DIR="$ROOT_DIR/app"

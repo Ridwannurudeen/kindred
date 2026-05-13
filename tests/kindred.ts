@@ -33,7 +33,6 @@ import {
   getArciumAccountBaseSeed,
   getArciumProgramId,
   getArciumProgram,
-  uploadCircuit,
   RescueCipher,
   deserializeLE,
   getMXEPublicKey,
@@ -51,7 +50,12 @@ import * as fs from "fs";
 import * as os from "os";
 import { expect } from "chai";
 
-const CIRCUITS = ["init_org_registry", "register_profile", "intra_org_match", "cross_org_match"];
+const CIRCUITS = [
+  "init_org_registry",
+  "register_profile",
+  "intra_org_match",
+  "cross_org_match",
+];
 
 // StrProfile = Pack<[u8; 40]> on the circuit side. createPacker turns 40 u8s into
 // the 2 BigInt containers Arcis expects (40*8 = 320 bits, 213-bit packing budget per
@@ -63,9 +67,17 @@ const PROFILE_FIELDS = Array.from({ length: 40 }, (_, i) => ({
 }));
 
 type ProfilePlain = { alleles: number[] };
-const profilePacker = createPacker<ProfilePlain, ProfilePlain>(PROFILE_FIELDS, "StrProfile");
+const profilePacker = createPacker<ProfilePlain, ProfilePlain>(
+  PROFILE_FIELDS,
+  "StrProfile",
+);
 
-type ProfileRecord = { id: string; org: string; alleles: number[]; notes: string };
+type ProfileRecord = {
+  id: string;
+  org: string;
+  alleles: number[];
+  notes: string;
+};
 const PROFILES: ProfileRecord[] = (
   JSON.parse(
     fs.readFileSync("data/synthetic-profiles/profiles.json", "utf-8"),
@@ -74,7 +86,10 @@ const PROFILES: ProfileRecord[] = (
 
 const findProfile = (id: string): ProfileRecord => {
   const p = PROFILES.find((x) => x.id === id);
-  if (!p) throw new Error(`profile ${id} not in data/synthetic-profiles/profiles.json`);
+  if (!p)
+    throw new Error(
+      `profile ${id} not in data/synthetic-profiles/profiles.json`,
+    );
   return p;
 };
 
@@ -85,7 +100,9 @@ describe("Kindred", () => {
   const arciumProgram = getArciumProgram(provider);
 
   type Event = anchor.IdlEvents<(typeof program)["idl"]>;
-  const awaitEvent = async <E extends keyof Event>(eventName: E): Promise<Event[E]> => {
+  const awaitEvent = async <E extends keyof Event>(
+    eventName: E,
+  ): Promise<Event[E]> => {
     let listenerId: number;
     const event = await new Promise<Event[E]>((res) => {
       listenerId = program.addEventListener(eventName, (event) => res(event));
@@ -97,7 +114,9 @@ describe("Kindred", () => {
   const arciumEnv = getArciumEnv();
   const clusterAccount = getClusterAccAddress(arciumEnv.arciumClusterOffset);
 
-  const owner = readKpJson(`${os.homedir()}/.config/solana/id.json`);
+  const owner = readKpJson(
+    process.env.ANCHOR_WALLET ?? `${os.homedir()}/.config/solana/id.json`,
+  );
 
   // Cached across tests
   let mxePubkey: Uint8Array;
@@ -110,13 +129,20 @@ describe("Kindred", () => {
     }
 
     const fetched = await getMXEPublicKey(provider, program.programId);
-    if (!fetched) throw new Error("MXE public key not available — is the cluster set?");
+    if (!fetched)
+      throw new Error("MXE public key not available — is the cluster set?");
     mxePubkey = fetched;
   });
 
   it("Creates two adoption registries", async () => {
-    await createOrg(orgIdFromName("Oregon Adoption Registry"), "Oregon Adoption Registry");
-    await createOrg(orgIdFromName("Texas Adoption Registry"), "Texas Adoption Registry");
+    await createOrg(
+      orgIdFromName("Oregon Adoption Registry"),
+      "Oregon Adoption Registry",
+    );
+    await createOrg(
+      orgIdFromName("Texas Adoption Registry"),
+      "Texas Adoption Registry",
+    );
   });
 
   it("Signs federation agreement between OAR and TAR", async () => {
@@ -126,7 +152,9 @@ describe("Kindred", () => {
 
     // Single-keypair demo: owner signs as both admin_a and admin_b.
     const sig = await program.methods
-      .setFederationAgreement(new anchor.BN(Math.floor(Date.now() / 1000) + 86400 * 365))
+      .setFederationAgreement(
+        new anchor.BN(Math.floor(Date.now() / 1000) + 86400 * 365),
+      )
       .accountsPartial({
         adminA: owner.publicKey,
         adminB: owner.publicKey,
@@ -154,7 +182,11 @@ describe("Kindred", () => {
   it("Cross-org match: Maya ↔ TAR-002 reveals parent-child score", async () => {
     const orgOar = derivePda("org", orgIdFromName("Oregon Adoption Registry"));
     const orgTar = derivePda("org", orgIdFromName("Texas Adoption Registry"));
-    const mayaProfile = derivePda("profile", orgOar.toBuffer(), owner.publicKey.toBuffer());
+    const mayaProfile = derivePda(
+      "profile",
+      orgOar.toBuffer(),
+      owner.publicKey.toBuffer(),
+    );
     const bioMotherProfile = derivePda(
       "profile",
       orgTar.toBuffer(),
@@ -184,8 +216,14 @@ describe("Kindred", () => {
 
     // 2. Bio mother consents → queues cross_org_match MXE.
     const computationOffset = new anchor.BN(randomBytes(8), "hex");
-    const orgOarBucket = derivePda("org_bucket", orgIdFromName("Oregon Adoption Registry"));
-    const orgTarBucket = derivePda("org_bucket", orgIdFromName("Texas Adoption Registry"));
+    const orgOarBucket = derivePda(
+      "org_bucket",
+      orgIdFromName("Oregon Adoption Registry"),
+    );
+    const orgTarBucket = derivePda(
+      "org_bucket",
+      orgIdFromName("Texas Adoption Registry"),
+    );
 
     const consentEvent = awaitEvent("matchRevealedEvent");
 
@@ -202,7 +240,9 @@ describe("Kindred", () => {
         clusterAccount,
         mxeAccount: getMXEAccAddress(program.programId),
         mempoolAccount: getMempoolAccAddress(arciumEnv.arciumClusterOffset),
-        executingPool: getExecutingPoolAccAddress(arciumEnv.arciumClusterOffset),
+        executingPool: getExecutingPoolAccAddress(
+          arciumEnv.arciumClusterOffset,
+        ),
         computationAccount: getComputationAccAddress(
           arciumEnv.arciumClusterOffset,
           computationOffset,
@@ -216,7 +256,12 @@ describe("Kindred", () => {
       .rpc({ skipPreflight: true, commitment: "confirmed" });
     console.log("consent_cross_match:", consentSig);
 
-    await awaitComputationFinalization(provider, computationOffset, program.programId, "confirmed");
+    await awaitComputationFinalization(
+      provider,
+      computationOffset,
+      program.programId,
+      "confirmed",
+    );
 
     const event = await consentEvent;
     const score = (event as { score: number }).score;
@@ -248,14 +293,18 @@ describe("Kindred", () => {
           clusterAccount,
           mxeAccount: getMXEAccAddress(program.programId),
           mempoolAccount: getMempoolAccAddress(arciumEnv.arciumClusterOffset),
-          executingPool: getExecutingPoolAccAddress(arciumEnv.arciumClusterOffset),
+          executingPool: getExecutingPoolAccAddress(
+            arciumEnv.arciumClusterOffset,
+          ),
           computationAccount: getComputationAccAddress(
             arciumEnv.arciumClusterOffset,
             computationOffset,
           ),
           compDefAccount: getCompDefAccAddress(
             program.programId,
-            Buffer.from(getCompDefAccOffset("init_org_registry")).readUInt32LE(),
+            Buffer.from(
+              getCompDefAccOffset("init_org_registry"),
+            ).readUInt32LE(),
           ),
         })
         .signers([owner])
@@ -270,7 +319,12 @@ describe("Kindred", () => {
 
     // Wait for init_org_registry_callback to write the empty bucket; subsequent
     // register_profile calls depend on the bucket existing with a known nonce.
-    await awaitComputationFinalization(provider, computationOffset, program.programId, "confirmed");
+    await awaitComputationFinalization(
+      provider,
+      computationOffset,
+      program.programId,
+      "confirmed",
+    );
     console.log(`  ${name}: created`);
   }
 
@@ -312,7 +366,9 @@ describe("Kindred", () => {
         clusterAccount,
         mxeAccount: getMXEAccAddress(program.programId),
         mempoolAccount: getMempoolAccAddress(arciumEnv.arciumClusterOffset),
-        executingPool: getExecutingPoolAccAddress(arciumEnv.arciumClusterOffset),
+        executingPool: getExecutingPoolAccAddress(
+          arciumEnv.arciumClusterOffset,
+        ),
         computationAccount: getComputationAccAddress(
           arciumEnv.arciumClusterOffset,
           computationOffset,
@@ -327,11 +383,19 @@ describe("Kindred", () => {
 
     // register_profile_callback writes the new bucket state and increments member_count.
     // Subsequent matches read from this updated state, so serialize on finalization.
-    await awaitComputationFinalization(provider, computationOffset, program.programId, "confirmed");
+    await awaitComputationFinalization(
+      provider,
+      computationOffset,
+      program.programId,
+      "confirmed",
+    );
     console.log(`  ${p.id} registered in ${p.org}`);
   }
 
-  async function initCompDef(circuit: string, signer: anchor.web3.Keypair): Promise<string> {
+  async function initCompDef(
+    circuit: string,
+    signer: anchor.web3.Keypair,
+  ): Promise<string> {
     const baseSeed = getArciumAccountBaseSeed("ComputationDefinitionAccount");
     const offset = getCompDefAccOffset(circuit);
     const compDefPda = PublicKey.findProgramAddressSync(
@@ -341,12 +405,16 @@ describe("Kindred", () => {
 
     const mxeAccount = getMXEAccAddress(program.programId);
     const mxeAcc = await arciumProgram.account.mxeAccount.fetch(mxeAccount);
-    const lutAddress = getLookupTableAddress(program.programId, mxeAcc.lutOffsetSlot);
+    const lutAddress = getLookupTableAddress(
+      program.programId,
+      mxeAcc.lutOffsetSlot,
+    );
 
     const existing = await provider.connection.getAccountInfo(compDefPda);
     let sig = "(already initialized)";
     if (!existing) {
-      const methodName = `init${snakeToPascal(circuit)}CompDef` as keyof typeof program.methods;
+      const methodName =
+        `init${snakeToPascal(circuit)}CompDef` as keyof typeof program.methods;
       sig = await (program.methods as any)
         [methodName]()
         .accounts({
@@ -358,18 +426,17 @@ describe("Kindred", () => {
         .signers([signer])
         .rpc({ commitment: "confirmed" });
 
-      const rawCircuit = fs.readFileSync(`build/${circuit}.arcis`);
-      // chunkSize=25 to stay under public-RPC rate limits (per scripts/init-comp-defs.ts).
-      await uploadCircuit(provider, circuit, program.programId, rawCircuit, true, 25, {
-        skipPreflight: true,
-        preflightCommitment: "confirmed",
-        commitment: "confirmed",
-      });
+      // Off-chain mode: lib.rs's init_*_comp_def writes CircuitSource::OffChain with
+      // the VPS URL and the compile-time circuit_hash!. No on-chain uploadCircuit
+      // needed — Arx nodes fetch + verify the .arcis from kindred.gudman.xyz/circuits.
     }
     return sig;
   }
 
-  function derivePda(seed: string, ...keys: (Buffer | Uint8Array)[]): PublicKey {
+  function derivePda(
+    seed: string,
+    ...keys: (Buffer | Uint8Array)[]
+  ): PublicKey {
     const seeds: (Buffer | Uint8Array)[] = [Buffer.from(seed)];
     for (const k of keys) seeds.push(k);
     return PublicKey.findProgramAddressSync(seeds, program.programId)[0];
@@ -378,7 +445,9 @@ describe("Kindred", () => {
 
 function readKpJson(path: string): anchor.web3.Keypair {
   const file = fs.readFileSync(path);
-  return anchor.web3.Keypair.fromSecretKey(new Uint8Array(JSON.parse(file.toString())));
+  return anchor.web3.Keypair.fromSecretKey(
+    new Uint8Array(JSON.parse(file.toString())),
+  );
 }
 
 function orgIdFromName(name: string): Buffer {
@@ -390,5 +459,8 @@ function orgIdFromName(name: string): Buffer {
 }
 
 function snakeToPascal(s: string): string {
-  return s.split("_").map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join("");
+  return s
+    .split("_")
+    .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
+    .join("");
 }

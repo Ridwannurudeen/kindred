@@ -10,7 +10,7 @@
 # Prereqs:
 #   - `arcium build` has emitted build/*.arcis (all 4 circuits)
 #   - nginx vhost has the /circuits/ location block from scripts/deploy-vps.sh
-#   - rsync + ssh access to VPS_HOST
+#   - scp + ssh access to VPS_HOST
 #
 # Usage:
 #   ./scripts/upload-circuits-to-vps.sh
@@ -20,7 +20,7 @@ set -euo pipefail
 
 VPS_HOST="${VPS_HOST:-root@gudman.xyz}"
 DOMAIN="${DOMAIN:-kindred.gudman.xyz}"
-REMOTE_DIR="${REMOTE_DIR:-/var/www/kindred-circuits}"
+REMOTE_DIR="${REMOTE_DIR:-/opt/kindred/circuits}"
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 BUILD_DIR="$ROOT_DIR/build"
@@ -44,14 +44,15 @@ for c in "${CIRCUITS[@]}"; do
     printf "  %-22s %8d bytes  sha256=%s\n" "$c" "$size" "$hash"
 done
 
-echo "==> rsync build/*.arcis -> $VPS_HOST:$REMOTE_DIR"
+echo "==> scp build/*.arcis -> $VPS_HOST:$REMOTE_DIR"
 ssh "$VPS_HOST" "mkdir -p $REMOTE_DIR && chmod 755 $REMOTE_DIR"
-rsync -avz --chmod=F644 \
+scp -q \
     "$BUILD_DIR"/init_org_registry.arcis \
     "$BUILD_DIR"/register_profile.arcis \
     "$BUILD_DIR"/intra_org_match.arcis \
     "$BUILD_DIR"/cross_org_match.arcis \
     "$VPS_HOST:$REMOTE_DIR/"
+ssh "$VPS_HOST" "chmod 644 $REMOTE_DIR/*.arcis"
 
 echo "==> Verifying reachability over HTTPS"
 for c in "${CIRCUITS[@]}"; do
