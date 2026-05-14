@@ -44,7 +44,7 @@ export function Onboarding() {
     // For demo this just simulates registration with a 1.5s delay.
     await new Promise((r) => setTimeout(r, 1500));
     setRegistered(true);
-    setTimeout(() => nav("/browse"), 1200);
+    setTimeout(() => nav(`/browse?persona=${persona.id}`), 1200);
   }
 
   return (

@@ -78,19 +78,19 @@ export function HowItWorks() {
       <div className="section-header">Read more</div>
       <ul className="text-dim text-small" style={{ lineHeight: 1.8, paddingLeft: 24 }}>
         <li>
-          <a href="/docs/CIRCUIT_DESIGN.md" style={{ color: "var(--accent)" }}>
+          <a href="https://github.com/Ridwannurudeen/kindred/blob/master/docs/CIRCUIT_DESIGN.md" style={{ color: "var(--accent)" }}>
             CIRCUIT_DESIGN.md
           </a>{" "}
           — branchless IBS proof + hand-traced cases
         </li>
         <li>
-          <a href="/docs/THREAT_MODEL.md" style={{ color: "var(--accent)" }}>
+          <a href="https://github.com/Ridwannurudeen/kindred/blob/master/docs/THREAT_MODEL.md" style={{ color: "var(--accent)" }}>
             THREAT_MODEL.md
           </a>{" "}
           — what Kindred protects, what it doesn&apos;t
         </li>
         <li>
-          <a href="/docs/ARCHITECTURE.md" style={{ color: "var(--accent)" }}>
+          <a href="https://github.com/Ridwannurudeen/kindred/blob/master/docs/ARCHITECTURE.md" style={{ color: "var(--accent)" }}>
             ARCHITECTURE.md
           </a>{" "}
           — sequence diagrams + system layers

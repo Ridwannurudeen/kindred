@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 export function Inbox() {
+  const [rejected, setRejected] = useState(false);
+
   return (
     <>
       <div className="hero" style={{ paddingBottom: 24 }}>
@@ -27,10 +30,16 @@ export function Inbox() {
           Profiles stay encrypted forever.
         </p>
         <div className="row mt-2">
-          <Link to="/reveal/OAR-001--TAR-002?type=cross" className="btn primary">
-            Accept + compute
-          </Link>
-          <button>Reject</button>
+          {rejected ? (
+            <span className="text-small text-dim">Request rejected — closed.</span>
+          ) : (
+            <>
+              <Link to="/reveal/OAR-001--TAR-002?persona=maya&type=cross" className="btn primary">
+                Accept + compute
+              </Link>
+              <button onClick={() => setRejected(true)}>Reject</button>
+            </>
+          )}
         </div>
       </div>
 
