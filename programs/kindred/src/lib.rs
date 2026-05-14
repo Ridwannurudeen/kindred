@@ -938,7 +938,9 @@ pub struct ConsentIntraMatch<'info> {
     pub requester_profile: Box<Account<'info, Profile>>,
     #[account(mut)]
     pub match_request: Box<Account<'info, MatchRequest>>,
-    #[account(seeds = [b"org_bucket", target_profile.org.as_ref()], bump = org_bucket.bump)]
+    #[account(address = target_profile.org)]
+    pub org: Box<Account<'info, Org>>,
+    #[account(seeds = [b"org_bucket", org.org_id.as_ref()], bump = org_bucket.bump)]
     pub org_bucket: Box<Account<'info, OrgBucket>>,
 }
 
@@ -1003,9 +1005,13 @@ pub struct ConsentCrossMatch<'info> {
     #[account(mut)]
     pub match_request: Box<Account<'info, MatchRequest>>,
     pub federation_agreement: Box<Account<'info, FederationAgreement>>,
-    #[account(seeds = [b"org_bucket", requester_profile.org.as_ref()], bump = org_a_bucket.bump)]
+    #[account(address = requester_profile.org)]
+    pub org_a: Box<Account<'info, Org>>,
+    #[account(address = target_profile.org)]
+    pub org_b: Box<Account<'info, Org>>,
+    #[account(seeds = [b"org_bucket", org_a.org_id.as_ref()], bump = org_a_bucket.bump)]
     pub org_a_bucket: Box<Account<'info, OrgBucket>>,
-    #[account(seeds = [b"org_bucket", target_profile.org.as_ref()], bump = org_b_bucket.bump)]
+    #[account(seeds = [b"org_bucket", org_b.org_id.as_ref()], bump = org_b_bucket.bump)]
     pub org_b_bucket: Box<Account<'info, OrgBucket>>,
 }
 

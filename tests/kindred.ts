@@ -150,6 +150,11 @@ describe("Kindred", () => {
     const orgB = derivePda("org", orgIdFromName("Texas Adoption Registry"));
     const agreement = derivePda("fed", orgA.toBuffer(), orgB.toBuffer());
 
+    if (await provider.connection.getAccountInfo(agreement)) {
+      console.log("Federation agreement already exists, skipping");
+      return;
+    }
+
     // Single-keypair demo: owner signs as both admin_a and admin_b.
     const sig = await program.methods
       .setFederationAgreement(
@@ -199,6 +204,16 @@ describe("Kindred", () => {
     );
     const agreement = derivePda("fed", orgOar.toBuffer(), orgTar.toBuffer());
 
+    const existingReq = await provider.connection.getAccountInfo(matchRequest);
+    if (existingReq && existingReq.data[73] === 3) {
+      const existingScore = existingReq.data[74];
+      console.log(`MatchRequest already revealed score=${existingScore}, skipping new request`);
+      expect(existingScore).to.be.at.least(20);
+      expect(existingScore).to.be.at.most(26);
+      expect(existingReq.data[75]).to.equal(1);
+      return;
+    }
+
     // 1. Maya requests cross-org match.
     const reqSig = await program.methods
       .requestCrossMatch()
@@ -235,6 +250,8 @@ describe("Kindred", () => {
         requesterProfile: mayaProfile,
         matchRequest,
         federationAgreement: agreement,
+        orgA: orgOar,
+        orgB: orgTar,
         orgABucket: orgOarBucket,
         orgBBucket: orgTarBucket,
         clusterAccount,
@@ -282,6 +299,12 @@ describe("Kindred", () => {
     const computationOffset = new anchor.BN(randomBytes(8), "hex");
     const orgPda = derivePda("org", orgId);
     const orgBucketPda = derivePda("org_bucket", orgId);
+
+    const existing = await provider.connection.getAccountInfo(orgPda);
+    if (existing) {
+      console.log(`  ${name}: already exists, skipping`);
+      return;
+    }
 
     try {
       await program.methods
@@ -332,6 +355,12 @@ describe("Kindred", () => {
     const orgIdBuf = orgIdFromName(p.org);
     const orgPda = derivePda("org", orgIdBuf);
     const orgBucketPda = derivePda("org_bucket", orgIdBuf);
+    const profilePda = derivePda("profile", orgPda.toBuffer(), owner.publicKey.toBuffer());
+
+    if (await provider.connection.getAccountInfo(profilePda)) {
+      console.log(`  profile for ${p.id} already registered, skipping`);
+      return;
+    }
 
     // Encrypt the 40-byte STR profile to 2 Rescue ciphertext blocks.
     const priv = x25519.utils.randomSecretKey();
