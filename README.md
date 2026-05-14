@@ -10,6 +10,13 @@ Submission to [Arcium Road to Genesis — DNA Matching track](https://rtg.arcium
 
 ---
 
+## Demo
+
+- **Live app:** [kindred.gudman.xyz](https://kindred.gudman.xyz)
+- **90-second walkthrough:** [youtu.be/rBao3EV8PtI](https://youtu.be/rBao3EV8PtI)
+
+---
+
 ## Why MPC, specifically
 
 | Architecture | Failure mode |

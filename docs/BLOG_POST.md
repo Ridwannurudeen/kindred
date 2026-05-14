@@ -2,6 +2,8 @@
 
 *How Arcium made cross-organizational DNA matching possible without any organization seeing the others' data.*
 
+**[Live demo](https://kindred.gudman.xyz)** · **[90-second walkthrough](https://youtu.be/rBao3EV8PtI)**
+
 ---
 
 ## I. The institutional shape of the problem

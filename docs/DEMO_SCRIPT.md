@@ -73,4 +73,4 @@ Target: 90 seconds, 1080p screen capture with voiceover. Centerpiece is Maya's c
 
 ## Deliverable
 
-`kindred-demo-90s.mp4` — H.264, 1080p, AAC audio, ≤30MB. Upload to YouTube unlisted; embed in submission.
+`kindred-demo-90s.mp4` — H.264, 1080p, AAC audio, ≤30MB. Published: [youtu.be/rBao3EV8PtI](https://youtu.be/rBao3EV8PtI).

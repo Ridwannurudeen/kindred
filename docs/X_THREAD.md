@@ -79,6 +79,7 @@ For the @ArciumHQ Road to Genesis, DNA Matching track.
 
 Code: github.com/.../kindred (open source, MIT)
 Demo: kindred.gudman.xyz
+Video: youtu.be/rBao3EV8PtI
 Writeup: [link to blog post]
 
 If you work for an adoption registry, refugee-tracing network, donor-conceived advocacy org, or diaspora-heritage organization — get in touch. Federation infrastructure is what's missing.
