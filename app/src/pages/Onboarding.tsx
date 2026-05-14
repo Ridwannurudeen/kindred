@@ -15,18 +15,18 @@ export function Onboarding() {
   const [registered, setRegistered] = useState(false);
 
   useEffect(() => {
-    if (personaId) {
-      // Auto-load synthetic profile for the persona's first profile
-      // (demo only; in production user uploads their own CSV)
-      const profileId = `${persona.orgId}-001`;
-      fetch(`/synthetic-profiles/${profileId}.csv`)
-        .then((r) => (r.ok ? r.text() : Promise.reject(`No demo profile for ${profileId}`)))
-        .then((text) => setCsv(text))
-        .catch(() => {
-          // Fallback: empty so user can paste manually
-        });
-    }
-  }, [personaId, persona.orgId]);
+    // Auto-load the resolved persona profile (demo only; in production the
+    // user uploads their own CSV). persona always resolves — it falls back
+    // to PERSONAS[0] — so this runs even when Onboarding is reached via the
+    // hero CTA with no ?persona= param.
+    const profileId = `${persona.orgId}-001`;
+    fetch(`/synthetic-profiles/${profileId}.csv`)
+      .then((r) => (r.ok ? r.text() : Promise.reject(`No demo profile for ${profileId}`)))
+      .then((text) => setCsv(text))
+      .catch(() => {
+        // Fallback: empty so user can paste manually
+      });
+  }, [persona.orgId]);
 
   function onParse() {
     const result = parseCodisCsv(csv);
