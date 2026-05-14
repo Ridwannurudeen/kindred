@@ -52,7 +52,7 @@ const ORGS = [
 // StrProfile = Pack<[u8; 40]>. createPacker bundles 40 u8s into the 2 BigInt
 // containers Arcis expects (320 bits / 213-bit packing budget → 2 chunks), so
 // RescueCipher.encrypt returns exactly 2 ciphertext blocks matching
-// register_profile(ciphertext_0: [u8;32], ciphertext_1: [u8;32]).
+// register_profile_v2(ciphertext_0: [u8;32], ciphertext_1: [u8;32]).
 const PROFILE_FIELDS = Array.from({ length: 40 }, (_, i) => ({
   name: `alleles[${i}]`,
   type: { Integer: { signed: false, width: 8 } },
@@ -95,7 +95,7 @@ async function main() {
           ),
           compDefAccount: getCompDefAccAddress(
             program.programId,
-            Buffer.from(getCompDefAccOffset("init_org_registry")).readUInt32LE(),
+            Buffer.from(getCompDefAccOffset("init_org_registry_v2")).readUInt32LE(),
           ),
         })
         .signers([owner])
@@ -188,7 +188,7 @@ async function main() {
           ),
           compDefAccount: getCompDefAccAddress(
             program.programId,
-            Buffer.from(getCompDefAccOffset("register_profile")).readUInt32LE(),
+            Buffer.from(getCompDefAccOffset("register_profile_v2")).readUInt32LE(),
           ),
         })
         .signers([owner])

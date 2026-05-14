@@ -5,10 +5,10 @@ use arcium_macros::circuit_hash;
 
 const CIRCUIT_HOST: &str = "https://kindred.gudman.xyz/circuits";
 
-const COMP_DEF_OFFSET_INIT_ORG_REGISTRY: u32 = comp_def_offset("init_org_registry");
-const COMP_DEF_OFFSET_REGISTER_PROFILE: u32 = comp_def_offset("register_profile");
-const COMP_DEF_OFFSET_INTRA_ORG_MATCH: u32 = comp_def_offset("intra_org_match");
-const COMP_DEF_OFFSET_CROSS_ORG_MATCH: u32 = comp_def_offset("cross_org_match");
+const COMP_DEF_OFFSET_INIT_ORG_REGISTRY: u32 = comp_def_offset("init_org_registry_v2");
+const COMP_DEF_OFFSET_REGISTER_PROFILE: u32 = comp_def_offset("register_profile_v2");
+const COMP_DEF_OFFSET_INTRA_ORG_MATCH: u32 = comp_def_offset("intra_org_match_v2");
+const COMP_DEF_OFFSET_CROSS_ORG_MATCH: u32 = comp_def_offset("cross_org_match_v2");
 
 declare_id!("dxfUyyp55B2fAbgAVF491gRAvz2gqkvqKFMY9SDJH7B");
 
@@ -39,8 +39,8 @@ pub mod kindred {
         init_comp_def(
             ctx.accounts,
             Some(CircuitSource::OffChain(OffChainCircuitSource {
-                source: format!("{}/init_org_registry.arcis", CIRCUIT_HOST),
-                hash: circuit_hash!("init_org_registry"),
+                source: format!("{}/init_org_registry_v2.arcis", CIRCUIT_HOST),
+                hash: circuit_hash!("init_org_registry_v2"),
             })),
             None,
         )?;
@@ -53,8 +53,8 @@ pub mod kindred {
         init_comp_def(
             ctx.accounts,
             Some(CircuitSource::OffChain(OffChainCircuitSource {
-                source: format!("{}/register_profile.arcis", CIRCUIT_HOST),
-                hash: circuit_hash!("register_profile"),
+                source: format!("{}/register_profile_v2.arcis", CIRCUIT_HOST),
+                hash: circuit_hash!("register_profile_v2"),
             })),
             None,
         )?;
@@ -67,8 +67,8 @@ pub mod kindred {
         init_comp_def(
             ctx.accounts,
             Some(CircuitSource::OffChain(OffChainCircuitSource {
-                source: format!("{}/intra_org_match.arcis", CIRCUIT_HOST),
-                hash: circuit_hash!("intra_org_match"),
+                source: format!("{}/intra_org_match_v2.arcis", CIRCUIT_HOST),
+                hash: circuit_hash!("intra_org_match_v2"),
             })),
             None,
         )?;
@@ -81,8 +81,8 @@ pub mod kindred {
         init_comp_def(
             ctx.accounts,
             Some(CircuitSource::OffChain(OffChainCircuitSource {
-                source: format!("{}/cross_org_match.arcis", CIRCUIT_HOST),
-                hash: circuit_hash!("cross_org_match"),
+                source: format!("{}/cross_org_match_v2.arcis", CIRCUIT_HOST),
+                hash: circuit_hash!("cross_org_match_v2"),
             })),
             None,
         )?;
@@ -121,7 +121,7 @@ pub mod kindred {
             ctx.accounts,
             computation_offset,
             args,
-            vec![InitOrgRegistryCallback::callback_ix(
+            vec![InitOrgRegistryV2Callback::callback_ix(
                 computation_offset,
                 &ctx.accounts.mxe_account,
                 &[CallbackAccount {
@@ -140,16 +140,16 @@ pub mod kindred {
         Ok(())
     }
 
-    #[arcium_callback(encrypted_ix = "init_org_registry")]
-    pub fn init_org_registry_callback(
-        ctx: Context<InitOrgRegistryCallback>,
-        output: SignedComputationOutputs<InitOrgRegistryOutput>,
+    #[arcium_callback(encrypted_ix = "init_org_registry_v2")]
+    pub fn init_org_registry_v2_callback(
+        ctx: Context<InitOrgRegistryV2Callback>,
+        output: SignedComputationOutputs<InitOrgRegistryV2Output>,
     ) -> Result<()> {
         let o = match output.verify_output(
             &ctx.accounts.cluster_account,
             &ctx.accounts.computation_account,
         ) {
-            Ok(InitOrgRegistryOutput { field_0 }) => field_0,
+            Ok(InitOrgRegistryV2Output { field_0 }) => field_0,
             Err(_) => return Err(ErrorCode::AbortedComputation.into()),
         };
 
@@ -235,7 +235,7 @@ pub mod kindred {
             ctx.accounts,
             computation_offset,
             args,
-            vec![RegisterProfileCallback::callback_ix(
+            vec![RegisterProfileV2Callback::callback_ix(
                 computation_offset,
                 &ctx.accounts.mxe_account,
                 &[
@@ -256,16 +256,16 @@ pub mod kindred {
         Ok(())
     }
 
-    #[arcium_callback(encrypted_ix = "register_profile")]
-    pub fn register_profile_callback(
-        ctx: Context<RegisterProfileCallback>,
-        output: SignedComputationOutputs<RegisterProfileOutput>,
+    #[arcium_callback(encrypted_ix = "register_profile_v2")]
+    pub fn register_profile_v2_callback(
+        ctx: Context<RegisterProfileV2Callback>,
+        output: SignedComputationOutputs<RegisterProfileV2Output>,
     ) -> Result<()> {
         let o = match output.verify_output(
             &ctx.accounts.cluster_account,
             &ctx.accounts.computation_account,
         ) {
-            Ok(RegisterProfileOutput { field_0 }) => field_0,
+            Ok(RegisterProfileV2Output { field_0 }) => field_0,
             Err(_) => return Err(ErrorCode::AbortedComputation.into()),
         };
 
@@ -371,7 +371,7 @@ pub mod kindred {
             ctx.accounts,
             computation_offset,
             args,
-            vec![IntraOrgMatchCallback::callback_ix(
+            vec![IntraOrgMatchV2Callback::callback_ix(
                 computation_offset,
                 &ctx.accounts.mxe_account,
                 &[CallbackAccount {
@@ -386,16 +386,16 @@ pub mod kindred {
         Ok(())
     }
 
-    #[arcium_callback(encrypted_ix = "intra_org_match")]
-    pub fn intra_org_match_callback(
-        ctx: Context<IntraOrgMatchCallback>,
-        output: SignedComputationOutputs<IntraOrgMatchOutput>,
+    #[arcium_callback(encrypted_ix = "intra_org_match_v2")]
+    pub fn intra_org_match_v2_callback(
+        ctx: Context<IntraOrgMatchV2Callback>,
+        output: SignedComputationOutputs<IntraOrgMatchV2Output>,
     ) -> Result<()> {
         let score = match output.verify_output(
             &ctx.accounts.cluster_account,
             &ctx.accounts.computation_account,
         ) {
-            Ok(IntraOrgMatchOutput { field_0 }) => field_0,
+            Ok(IntraOrgMatchV2Output { field_0 }) => field_0,
             Err(_) => return Err(ErrorCode::AbortedComputation.into()),
         };
 
@@ -457,7 +457,7 @@ pub mod kindred {
             ctx.accounts,
             computation_offset,
             args,
-            vec![CrossOrgMatchCallback::callback_ix(
+            vec![CrossOrgMatchV2Callback::callback_ix(
                 computation_offset,
                 &ctx.accounts.mxe_account,
                 &[CallbackAccount {
@@ -472,16 +472,16 @@ pub mod kindred {
         Ok(())
     }
 
-    #[arcium_callback(encrypted_ix = "cross_org_match")]
-    pub fn cross_org_match_callback(
-        ctx: Context<CrossOrgMatchCallback>,
-        output: SignedComputationOutputs<CrossOrgMatchOutput>,
+    #[arcium_callback(encrypted_ix = "cross_org_match_v2")]
+    pub fn cross_org_match_v2_callback(
+        ctx: Context<CrossOrgMatchV2Callback>,
+        output: SignedComputationOutputs<CrossOrgMatchV2Output>,
     ) -> Result<()> {
         let score = match output.verify_output(
             &ctx.accounts.cluster_account,
             &ctx.accounts.computation_account,
         ) {
-            Ok(CrossOrgMatchOutput { field_0 }) => field_0,
+            Ok(CrossOrgMatchV2Output { field_0 }) => field_0,
             Err(_) => return Err(ErrorCode::AbortedComputation.into()),
         };
 
@@ -583,7 +583,7 @@ pub struct MatchRequest {
 // Account contexts
 // =============================================================================
 
-#[init_computation_definition_accounts("init_org_registry", payer)]
+#[init_computation_definition_accounts("init_org_registry_v2", payer)]
 #[derive(Accounts)]
 pub struct InitInitOrgRegistryCompDef<'info> {
     #[account(mut)]
@@ -603,7 +603,7 @@ pub struct InitInitOrgRegistryCompDef<'info> {
     pub system_program: Program<'info, System>,
 }
 
-#[init_computation_definition_accounts("register_profile", payer)]
+#[init_computation_definition_accounts("register_profile_v2", payer)]
 #[derive(Accounts)]
 pub struct InitRegisterProfileCompDef<'info> {
     #[account(mut)]
@@ -623,7 +623,7 @@ pub struct InitRegisterProfileCompDef<'info> {
     pub system_program: Program<'info, System>,
 }
 
-#[init_computation_definition_accounts("intra_org_match", payer)]
+#[init_computation_definition_accounts("intra_org_match_v2", payer)]
 #[derive(Accounts)]
 pub struct InitIntraOrgMatchCompDef<'info> {
     #[account(mut)]
@@ -643,7 +643,7 @@ pub struct InitIntraOrgMatchCompDef<'info> {
     pub system_program: Program<'info, System>,
 }
 
-#[init_computation_definition_accounts("cross_org_match", payer)]
+#[init_computation_definition_accounts("cross_org_match_v2", payer)]
 #[derive(Accounts)]
 pub struct InitCrossOrgMatchCompDef<'info> {
     #[account(mut)]
@@ -663,7 +663,7 @@ pub struct InitCrossOrgMatchCompDef<'info> {
     pub system_program: Program<'info, System>,
 }
 
-#[queue_computation_accounts("init_org_registry", payer)]
+#[queue_computation_accounts("init_org_registry_v2", payer)]
 #[derive(Accounts)]
 #[instruction(computation_offset: u64, org_id: [u8; 32])]
 pub struct CreateOrg<'info> {
@@ -717,9 +717,9 @@ pub struct CreateOrg<'info> {
     pub org_bucket: Box<Account<'info, OrgBucket>>,
 }
 
-#[callback_accounts("init_org_registry")]
+#[callback_accounts("init_org_registry_v2")]
 #[derive(Accounts)]
-pub struct InitOrgRegistryCallback<'info> {
+pub struct InitOrgRegistryV2Callback<'info> {
     pub arcium_program: Program<'info, Arcium>,
     #[account(address = derive_comp_def_pda!(COMP_DEF_OFFSET_INIT_ORG_REGISTRY))]
     pub comp_def_account: Account<'info, ComputationDefinitionAccount>,
@@ -782,7 +782,7 @@ pub struct RejectMatch<'info> {
     pub match_request: Box<Account<'info, MatchRequest>>,
 }
 
-#[queue_computation_accounts("register_profile", payer)]
+#[queue_computation_accounts("register_profile_v2", payer)]
 #[derive(Accounts)]
 #[instruction(computation_offset: u64)]
 pub struct RegisterProfile<'info> {
@@ -836,9 +836,9 @@ pub struct RegisterProfile<'info> {
     pub profile: Box<Account<'info, Profile>>,
 }
 
-#[callback_accounts("register_profile")]
+#[callback_accounts("register_profile_v2")]
 #[derive(Accounts)]
-pub struct RegisterProfileCallback<'info> {
+pub struct RegisterProfileV2Callback<'info> {
     pub arcium_program: Program<'info, Arcium>,
     #[account(address = derive_comp_def_pda!(COMP_DEF_OFFSET_REGISTER_PROFILE))]
     pub comp_def_account: Account<'info, ComputationDefinitionAccount>,
@@ -897,7 +897,7 @@ pub struct RequestCrossMatch<'info> {
     pub system_program: Program<'info, System>,
 }
 
-#[queue_computation_accounts("intra_org_match", payer)]
+#[queue_computation_accounts("intra_org_match_v2", payer)]
 #[derive(Accounts)]
 #[instruction(computation_offset: u64)]
 pub struct ConsentIntraMatch<'info> {
@@ -942,9 +942,9 @@ pub struct ConsentIntraMatch<'info> {
     pub org_bucket: Box<Account<'info, OrgBucket>>,
 }
 
-#[callback_accounts("intra_org_match")]
+#[callback_accounts("intra_org_match_v2")]
 #[derive(Accounts)]
-pub struct IntraOrgMatchCallback<'info> {
+pub struct IntraOrgMatchV2Callback<'info> {
     pub arcium_program: Program<'info, Arcium>,
     #[account(address = derive_comp_def_pda!(COMP_DEF_OFFSET_INTRA_ORG_MATCH))]
     pub comp_def_account: Account<'info, ComputationDefinitionAccount>,
@@ -961,7 +961,7 @@ pub struct IntraOrgMatchCallback<'info> {
     pub match_request: Account<'info, MatchRequest>,
 }
 
-#[queue_computation_accounts("cross_org_match", payer)]
+#[queue_computation_accounts("cross_org_match_v2", payer)]
 #[derive(Accounts)]
 #[instruction(computation_offset: u64)]
 pub struct ConsentCrossMatch<'info> {
@@ -1009,9 +1009,9 @@ pub struct ConsentCrossMatch<'info> {
     pub org_b_bucket: Box<Account<'info, OrgBucket>>,
 }
 
-#[callback_accounts("cross_org_match")]
+#[callback_accounts("cross_org_match_v2")]
 #[derive(Accounts)]
-pub struct CrossOrgMatchCallback<'info> {
+pub struct CrossOrgMatchV2Callback<'info> {
     pub arcium_program: Program<'info, Arcium>,
     #[account(address = derive_comp_def_pda!(COMP_DEF_OFFSET_CROSS_ORG_MATCH))]
     pub comp_def_account: Account<'info, ComputationDefinitionAccount>,

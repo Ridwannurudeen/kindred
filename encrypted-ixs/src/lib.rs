@@ -51,13 +51,13 @@ mod circuits {
     }
 
     #[instruction]
-    pub fn init_org_registry() -> Enc<Mxe, ProfileBucket> {
+    pub fn init_org_registry_v2() -> Enc<Mxe, ProfileBucket> {
         let bucket: [u8; 161] = [0u8; 161];
         Mxe::get().from_arcis(Pack::new(bucket))
     }
 
     #[instruction]
-    pub fn register_profile(
+    pub fn register_profile_v2(
         profile_ctxt: Enc<Shared, StrProfile>,
         registry_ctxt: Enc<Mxe, ProfileBucket>,
     ) -> Enc<Mxe, ProfileBucket> {
@@ -83,7 +83,7 @@ mod circuits {
     }
 
     #[instruction]
-    pub fn intra_org_match(
+    pub fn intra_org_match_v2(
         a_idx: u8,
         b_idx: u8,
         registry_ctxt: Enc<Mxe, ProfileBucket>,
@@ -96,7 +96,7 @@ mod circuits {
     }
 
     #[instruction]
-    pub fn cross_org_match(
+    pub fn cross_org_match_v2(
         a_idx: u8,
         b_idx: u8,
         registry_a_ctxt: Enc<Mxe, ProfileBucket>,

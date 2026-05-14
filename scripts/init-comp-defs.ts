@@ -30,10 +30,10 @@ import * as fs from "fs";
 import * as os from "os";
 
 const CIRCUITS = [
-  "init_org_registry",
-  "register_profile",
-  "intra_org_match",
-  "cross_org_match",
+  "init_org_registry_v2",
+  "register_profile_v2",
+  "intra_org_match_v2",
+  "cross_org_match_v2",
 ];
 
 function snakeToPascal(s: string): string {
@@ -91,7 +91,7 @@ async function main() {
         `  already initialized (${existing.data.length} bytes), skipping init`,
       );
     } else {
-      const methodName = `init${snakeToPascal(circuit)}CompDef`;
+      const methodName = `init${snakeToPascal(circuit.replace(/_v2$/, ""))}CompDef`;
       const sig = await (program.methods as any)
         [methodName]()
         .accounts({

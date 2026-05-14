@@ -5,10 +5,10 @@
  *  1. Init all 4 comp_defs
  *  2. Create two orgs (Oregon Adoption Registry + Texas Adoption Registry)
  *  3. Sign federation agreement between them
- *  4. Register Maya (OAR-001) in OAR via register_profile MXE
+ *  4. Register Maya (OAR-001) in OAR via register_profile_v2 MXE
  *  5. Register Maya's bio mother (TAR-002) in TAR
  *  6. Maya requests cross-org match
- *  7. Bio mother consents → cross_org_match MXE runs
+ *  7. Bio mother consents → cross_org_match_v2 MXE runs
  *  8. Verify revealed score is in parent-child range [20, 26]
  *
  * Runs against a deployed devnet program with circuits already uploaded.
@@ -51,16 +51,16 @@ import * as os from "os";
 import { expect } from "chai";
 
 const CIRCUITS = [
-  "init_org_registry",
-  "register_profile",
-  "intra_org_match",
-  "cross_org_match",
+  "init_org_registry_v2",
+  "register_profile_v2",
+  "intra_org_match_v2",
+  "cross_org_match_v2",
 ];
 
 // StrProfile = Pack<[u8; 40]> on the circuit side. createPacker turns 40 u8s into
 // the 2 BigInt containers Arcis expects (40*8 = 320 bits, 213-bit packing budget per
 // container → 2 chunks), so RescueCipher.encrypt then returns exactly 2 ciphertext
-// blocks matching register_profile(ciphertext_0: [u8;32], ciphertext_1: [u8;32]).
+// blocks matching register_profile_v2(ciphertext_0: [u8;32], ciphertext_1: [u8;32]).
 const PROFILE_FIELDS = Array.from({ length: 40 }, (_, i) => ({
   name: `alleles[${i}]`,
   type: { Integer: { signed: false, width: 8 } },
@@ -169,7 +169,7 @@ describe("Kindred", () => {
     console.log("Federation agreement signed:", sig);
   });
 
-  it("Registers Maya in OAR (encrypted profile via register_profile MXE)", async () => {
+  it("Registers Maya in OAR (encrypted profile via register_profile_v2 MXE)", async () => {
     const maya = findProfile("OAR-001");
     await registerProfile(maya);
   });
@@ -214,7 +214,7 @@ describe("Kindred", () => {
       .rpc({ commitment: "confirmed" });
     console.log("request_cross_match:", reqSig);
 
-    // 2. Bio mother consents → queues cross_org_match MXE.
+    // 2. Bio mother consents → queues cross_org_match_v2 MXE.
     const computationOffset = new anchor.BN(randomBytes(8), "hex");
     const orgOarBucket = derivePda(
       "org_bucket",
@@ -249,7 +249,7 @@ describe("Kindred", () => {
         ),
         compDefAccount: getCompDefAccAddress(
           program.programId,
-          Buffer.from(getCompDefAccOffset("cross_org_match")).readUInt32LE(),
+          Buffer.from(getCompDefAccOffset("cross_org_match_v2")).readUInt32LE(),
         ),
       })
       .signers([owner])
@@ -303,7 +303,7 @@ describe("Kindred", () => {
           compDefAccount: getCompDefAccAddress(
             program.programId,
             Buffer.from(
-              getCompDefAccOffset("init_org_registry"),
+              getCompDefAccOffset("init_org_registry_v2"),
             ).readUInt32LE(),
           ),
         })
@@ -318,7 +318,7 @@ describe("Kindred", () => {
     }
 
     // Wait for init_org_registry_callback to write the empty bucket; subsequent
-    // register_profile calls depend on the bucket existing with a known nonce.
+    // register_profile_v2 calls depend on the bucket existing with a known nonce.
     await awaitComputationFinalization(
       provider,
       computationOffset,
@@ -375,7 +375,7 @@ describe("Kindred", () => {
         ),
         compDefAccount: getCompDefAccAddress(
           program.programId,
-          Buffer.from(getCompDefAccOffset("register_profile")).readUInt32LE(),
+          Buffer.from(getCompDefAccOffset("register_profile_v2")).readUInt32LE(),
         ),
       })
       .signers([owner])

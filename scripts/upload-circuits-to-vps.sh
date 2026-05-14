@@ -25,7 +25,7 @@ REMOTE_DIR="${REMOTE_DIR:-/opt/kindred/circuits}"
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 BUILD_DIR="$ROOT_DIR/build"
 
-CIRCUITS=(init_org_registry register_profile intra_org_match cross_org_match)
+CIRCUITS=(init_org_registry_v2 register_profile_v2 intra_org_match_v2 cross_org_match_v2)
 
 echo "==> Verifying build artifacts"
 for c in "${CIRCUITS[@]}"; do
@@ -47,10 +47,10 @@ done
 echo "==> scp build/*.arcis -> $VPS_HOST:$REMOTE_DIR"
 ssh "$VPS_HOST" "mkdir -p $REMOTE_DIR && chmod 755 $REMOTE_DIR"
 scp -q \
-    "$BUILD_DIR"/init_org_registry.arcis \
-    "$BUILD_DIR"/register_profile.arcis \
-    "$BUILD_DIR"/intra_org_match.arcis \
-    "$BUILD_DIR"/cross_org_match.arcis \
+    "$BUILD_DIR"/init_org_registry_v2.arcis \
+    "$BUILD_DIR"/register_profile_v2.arcis \
+    "$BUILD_DIR"/intra_org_match_v2.arcis \
+    "$BUILD_DIR"/cross_org_match_v2.arcis \
     "$VPS_HOST:$REMOTE_DIR/"
 ssh "$VPS_HOST" "chmod 644 $REMOTE_DIR/*.arcis"
 
